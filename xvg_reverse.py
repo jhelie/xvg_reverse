@@ -51,7 +51,7 @@ Other options
 ''')
 
 #options
-parser.add_argument('-f', nargs=1, dest='xvgfilenames', help=argparse.SUPPRESS, required=True)
+parser.add_argument('-f', nargs=1, dest='xvgfilename', default=["none"], help=argparse.SUPPRESS, required=True)
 parser.add_argument('-o', nargs=1, dest='output_file', default=["auto"], help=argparse.SUPPRESS)
 parser.add_argument('--comments', nargs=1, dest='comments', default=['@,#'], help=argparse.SUPPRESS)
 
@@ -64,6 +64,7 @@ parser.add_argument('-h','--help', action='help', help=argparse.SUPPRESS)
 #=========================================================================================
 
 args = parser.parse_args()
+args.xvgfilename = args.xvgfilename[0]
 args.output_file = args.output_file[0]
 args.comments = args.comments[0].split(',')
 
@@ -88,13 +89,12 @@ except:
 # sanity check
 #=======================================================================
 
-for f in args.xvgfilename:
-	if not os.path.isfile(f):
-		print "Error: file " + str(f) + " not found."
-		sys.exit(1)
+if not os.path.isfile(args.xvgfilename):
+	print "Error: file " + str(args.xvgfilename) + " not found."
+	sys.exit(1)
 
 if args.output_file == "auto":
-	args.output_file = args.xvgfilename[:-4] + "_rev"
+	args.output_file = str(args.xvgfilename[:-4]) + "_rev"
 	
 ##########################################################################################
 # FUNCTIONS DEFINITIONS
@@ -148,7 +148,7 @@ def load_xvg():															#DONE
 				label_yaxis = line.split("label ")[1]
 			
 	#get all data in the file
-	tmp_f_data = np.loadtxt(filename, skiprows = tmp_nb_rows_to_skip)
+	tmp_f_data = np.loadtxt(args.xvgfilename, skiprows = tmp_nb_rows_to_skip)
 										
 	#get nb of rows and cols
 	nb_rows = np.shape(tmp_f_data)[0]
@@ -210,7 +210,7 @@ def write_xvg():
 print "\nReading files..."
 load_xvg()
 
-print "\n\nWriting reversed file..."
+print "\nWriting reversed file..."
 write_xvg()
 
 #=========================================================================================
